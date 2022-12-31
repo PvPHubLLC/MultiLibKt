@@ -1,5 +1,6 @@
 package co.pvphub.multilib
 
+import co.pvphub.multilib.dsl.synced
 import co.pvphub.multilib.util.color
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
