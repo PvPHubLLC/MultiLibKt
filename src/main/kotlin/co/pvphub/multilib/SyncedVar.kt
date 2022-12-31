@@ -41,7 +41,7 @@ open class SyncedVar<T : Serializable>(
                     return@thenAccept
                 }
                 val global = gson.fromJson(it, clazz)
-                setNoUpdate(global)
+                setNoSync(global)
             }
         /**
          * We'll call this event whenever we modify the variable. This will be when we sync the variable.
@@ -51,7 +51,7 @@ open class SyncedVar<T : Serializable>(
             val stream = ByteArrayInputStream(it)
             val out = ObjectInputStream(stream)
             try {
-                setNoUpdate(out.readObject() as T)
+                setNoSync(out.readObject() as T)
             } catch (_: ClassCastException) {
             }
         }
@@ -72,7 +72,7 @@ open class SyncedVar<T : Serializable>(
      *
      * @param value new value of this variable
      */
-    infix fun setNoUpdate(value: T?) {
+    infix fun setNoSync(value: T?) {
         shouldSync = false
         this.value = value
         shouldSync = true
