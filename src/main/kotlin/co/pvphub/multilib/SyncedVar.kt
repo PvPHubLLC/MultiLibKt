@@ -21,7 +21,7 @@ open class SyncedVar<T : Serializable>(
     initial: T?
 ) {
     // Gross variable to stop feedback loops of constantly trying to sync
-    private var shouldSync = true
+    var shouldSync = true
     var value = initial
         set(value) {
             field = value
@@ -102,7 +102,7 @@ open class SyncedVar<T : Serializable>(
      *
      * @param access consumer for the changes you make
      */
-    fun modifyVar(access: T.() -> Unit) {
+    inline fun modifyVar(access: T.() -> Unit) {
         if (value == null) return
         shouldSync = false
         access.invoke(value!!)
