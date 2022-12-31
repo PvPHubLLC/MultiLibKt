@@ -19,16 +19,19 @@ import kotlin.reflect.KProperty
  * @param name of the variable
  * @param clazz instance of the variable
  */
-class SyncedVar<T : Serializable>(
-    val plugin: JavaPlugin = DummyPlugin(),
-    initial: T?,
+open class SyncedVar<T : Serializable>(
+    val plugin: JavaPlugin,
     val name: String,
-    val clazz: Class<T>
+    val clazz: Class<T>,
+    initial: T?
 ) {
+    // Gross variable to stop feedback loops of constantly trying to sync
+    private var shouldSync = true
     var value = initial
         set(value) {
             field = value
-            sync()
+            if (shouldSync)
+                sync()
         }
 
     init {
@@ -43,7 +46,9 @@ class SyncedVar<T : Serializable>(
                     return@thenAccept
                 }
                 val global = gson.fromJson(it, clazz)
+                shouldSync = false
                 value = global
+                shouldSync = true
             }
         /**
          * We'll call this event whenever we modify the variable. This will be when we sync the variable.
@@ -53,7 +58,9 @@ class SyncedVar<T : Serializable>(
             val stream = ByteArrayInputStream(it)
             val out = ObjectInputStream(stream)
             try {
+                shouldSync = false
                 value = out.readObject() as T
+                shouldSync = true
             } catch (_: ClassCastException) {
             }
         }
@@ -62,12 +69,17 @@ class SyncedVar<T : Serializable>(
     /**
      * Call this manually after you change an internal variable.
      */
-    fun sync() {
-        MultiLib.getDataStorage().get("${plugin.description.name}-$name", gson.toJson(value))
+    fun sync() : SyncedVar<T> {
+        MultiLib.getDataStorage().set("${plugin.description.name}-$name", gson.toJson(value))
         val stream = ByteArrayOutputStream()
         val objOut = ObjectOutputStream(stream)
+        shouldSync = false
+        val value = this.value
         objOut.writeObject(value)
+        this.value = value
+        shouldSync = true
         MultiLib.notify("${plugin.description.name}-var-${name}", stream.toByteArray())
+        return this
     }
 
     /**
@@ -75,7 +87,6 @@ class SyncedVar<T : Serializable>(
      */
     fun delete() {
         value = null
-        sync()
     }
 
     /**
@@ -84,9 +95,13 @@ class SyncedVar<T : Serializable>(
      * @param access consumer for the changes you make
      */
     fun modifyVar(access: T?.() -> Unit) {
+        shouldSync = false
         access.invoke(value)
+        shouldSync = true
         sync()
     }
+
+    override fun toString() = value.toString()
 
     companion object {
         val gson = GsonBuilder().create()

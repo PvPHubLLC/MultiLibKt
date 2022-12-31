@@ -1,5 +1,6 @@
 package co.pvphub.multilib
 
+import org.bukkit.plugin.java.JavaPlugin
 import java.io.Serializable
 
-inline infix fun <reified T: Serializable> T.syncedVar(name: String) = SyncedVar(DummyPlugin(), this, name, T::class.java)
+inline fun <reified T: Serializable> T.synced(plugin: JavaPlugin, name: String) = SyncedVar(plugin, name, T::class.java, this)
