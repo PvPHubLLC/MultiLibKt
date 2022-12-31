@@ -102,9 +102,10 @@ open class SyncedVar<T : Serializable>(
      *
      * @param access consumer for the changes you make
      */
-    fun modifyVar(access: T?.() -> Unit) {
+    fun modifyVar(access: T.() -> Unit) {
+        if (value == null) return
         shouldSync = false
-        access.invoke(value)
+        access.invoke(value!!)
         shouldSync = true
         sync()
     }
