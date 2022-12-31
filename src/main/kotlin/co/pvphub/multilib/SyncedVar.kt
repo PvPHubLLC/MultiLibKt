@@ -41,9 +41,7 @@ open class SyncedVar<T : Serializable>(
                     return@thenAccept
                 }
                 val global = gson.fromJson(it, clazz)
-                shouldSync = false
-                value = global
-                shouldSync = true
+                setNoUpdate(global)
             }
         /**
          * We'll call this event whenever we modify the variable. This will be when we sync the variable.
@@ -53,17 +51,31 @@ open class SyncedVar<T : Serializable>(
             val stream = ByteArrayInputStream(it)
             val out = ObjectInputStream(stream)
             try {
-                shouldSync = false
-                value = out.readObject() as T
-                shouldSync = true
+                setNoUpdate(out.readObject() as T)
             } catch (_: ClassCastException) {
             }
         }
     }
 
+    /**
+     * Accessors for [value], can't think of a nicer
+     * way to set and get the value!
+     */
     operator fun invoke() = value
     operator fun invoke(newValue: T) {
         value = newValue
+    }
+
+    /**
+     * Change ONLY the local instance of the object,
+     * will not send out an update to the other servers.
+     *
+     * @param value new value of this variable
+     */
+    infix fun setNoUpdate(value: T?) {
+        shouldSync = false
+        this.value = value
+        shouldSync = true
     }
 
     /**
@@ -73,11 +85,7 @@ open class SyncedVar<T : Serializable>(
         MultiLib.getDataStorage().set("${plugin.description.name}-$name", gson.toJson(value))
         val stream = ByteArrayOutputStream()
         val objOut = ObjectOutputStream(stream)
-        shouldSync = false
-        val value = this.value
         objOut.writeObject(value)
-        this.value = value
-        shouldSync = true
         MultiLib.notify("${plugin.description.name}-var-${name}", stream.toByteArray())
         return this
     }
