@@ -1,5 +1,6 @@
 package co.pvphub.multilib
 
+import co.pvphub.multilib.util.color
 import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -13,6 +14,7 @@ class ExamplePlugin : JavaPlugin() {
     override fun onEnable() {
         instance = this
         Bukkit.getPluginCommand("multi-lib-example-var")?.setExecutor(ExampleCommand())
+        ExampleListener(this).register(this)
     }
 
     companion object {
