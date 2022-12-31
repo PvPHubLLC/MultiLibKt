@@ -34,7 +34,7 @@ class ExampleCommand : CommandExecutor, TabCompleter {
                         return false
                     }
                     val compiled = args.toList().subList(1, args.size).joinToString(" ")
-                    ExamplePlugin.instance.syncedVariable.value = compiled
+                    ExamplePlugin.instance.syncedVariable(compiled)
                     sender.sendMessage("&aChanged global variable's value to '$compiled&a'".color())
                     sender.sendMessage("&aHead to another backend server to check it out.".color())
                 }

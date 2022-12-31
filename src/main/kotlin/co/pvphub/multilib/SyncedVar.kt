@@ -66,6 +66,11 @@ open class SyncedVar<T : Serializable>(
         }
     }
 
+    operator fun invoke() = value
+    operator fun invoke(newValue: T) {
+        value = newValue
+    }
+
     /**
      * Call this manually after you change an internal variable.
      */
