@@ -4,7 +4,7 @@ import co.pvphub.multilib.util.toByteArray
 import com.github.puregero.multilib.MultiLib
 
 /**
- * Example listener class apart of the MultiLibKt library.
+ * Example listener class apart from the MultiLibKt library.
  * We can register this in the main class, [ExamplePlugin]
  */
 class ExampleListener(val plugin: ExamplePlugin) : MultiLibListener {
