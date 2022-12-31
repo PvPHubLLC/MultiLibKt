@@ -7,7 +7,7 @@ import com.github.puregero.multilib.MultiLib
  * Example listener class apart from the MultiLibKt library.
  * We can register this in the main class, [ExamplePlugin]
  */
-class ExampleListener(val plugin: ExamplePlugin) : MultiLibListener {
+class ExampleListener : MultiLibListener {
 
     /**
      * This is basically a listener that calls another straight away, useless.

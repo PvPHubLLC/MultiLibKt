@@ -15,7 +15,7 @@ class ExamplePlugin : JavaPlugin() {
     override fun onEnable() {
         instance = this
         Bukkit.getPluginCommand("multi-lib-example-var")?.setExecutor(ExampleCommand())
-        ExampleListener(this).register(this)
+        ExampleListener().register(this)
     }
 
     companion object {
